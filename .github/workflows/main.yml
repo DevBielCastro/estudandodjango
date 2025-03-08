@@ -1,0 +1,54 @@
+name: Django CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ${{ vars.DB_NAME || 'testdb' }}
+          MYSQL_USER: ${{ vars.DB_USER || 'testuser' }}
+          MYSQL_PASSWORD: ${{ vars.DB_PASSWORD || 'testpass' }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run migrations
+      run: python manage.py migrate
+      env:
+        DB_NAME: ${{ vars.DB_NAME || 'testdb' }}
+        DB_USER: ${{ vars.DB_USER || 'testuser' }}
+        DB_PASSWORD: ${{ vars.DB_PASSWORD || 'testpass' }}
+        DB_HOST: 127.0.0.1
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    - name: Run tests
+      run: python manage.py test
+      env:
+        DB_NAME: ${{ vars.DB_NAME || 'testdb' }}
+        DB_USER: ${{ vars.DB_USER || 'testuser' }}
+        DB_PASSWORD: ${{ vars.DB_PASSWORD || 'testpass' }}
+        DB_HOST: 127.0.0.1
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
