@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api_rest',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -63,19 +64,33 @@ TEMPLATES = [
 WSGI_APPLICATION = 'api_root.wsgi.application'
 
 
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'api_rest/static'),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 load_dotenv()
 
+from decouple import config
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'seu_banco_de_dados'),
-        'USER': os.getenv('MYSQL_USER', 'seu_usuario'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'sua_senha'),
-        'HOST': os.getenv('MYSQL_HOST', 'localhost'),
-        'PORT': os.getenv('MYSQL_PORT', '3306'),
+        'NAME': 'seu_banco_de_dados',  
+        'USER': 'seu_usuario',         
+        'PASSWORD': 'Admin20@',        
+        'HOST': 'localhost',           
+        'PORT': '3306', 
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }               
     }
 }
 
@@ -124,3 +139,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ORIGINS = [
     'https://localhost:8000',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'api_rest': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+    },
+}

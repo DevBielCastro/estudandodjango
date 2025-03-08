@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu App</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo ao Meu App</h1>
+    </header>
+    <div>
+        <p>Conteúdo dinâmico vindo do back-end:</p>
+        <p>{{ my_data }}</p>
+    </div>
+    <footer>
+        <p>Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
