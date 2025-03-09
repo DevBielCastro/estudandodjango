@@ -9,7 +9,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
     default-libmysqlclient-dev \
-    netcat && \
+    pkg-config \
+    libmariadb-dev \
+    netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -17,6 +19,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN chmod +x /app/wait-for-db.sh
+RUN chmod +x wait-for-db.sh
 
 CMD ["sh", "-c", "./wait-for-db.sh db 3306 -- python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
