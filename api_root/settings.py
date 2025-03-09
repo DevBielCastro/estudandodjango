@@ -83,10 +83,10 @@ from decouple import config
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'seu_banco_de_dados',  
-        'USER': 'seu_usuario',         
-        'PASSWORD': 'Admin20@',        
-        'HOST': 'localhost',           
+        'NAME': 'nome_do_banco',
+        'USER': 'usuario_mysql',
+        'PASSWORD': 'admin',
+        'HOST': '127.0.0.1',
         'PORT': '3306', 
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
