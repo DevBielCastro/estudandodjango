@@ -1,28 +1,55 @@
-version: '3'
-
 services:
   db:
-    image: mysql:5.7
+    image: mysql:8.0
+    container_name: estudandodjango-db
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - estudandodjango_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
     ports:
       - "3306:3306"
-  
+
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    container_name: estudandodjango-web
+    command: >
+      sh -c "./wait-for-db.sh db 3306 -- 
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    working_dir: /app
     volumes:
       - .:/app
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     environment:
-      MYSQL_DATABASE: "seu_banco_de_dados"
-      MYSQL_USER: "seu_usuario"
-      MYSQL_PASSWORD: "sua_senha"
-      MYSQL_HOST: "db"
-      MYSQL_PORT: "3306"
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - estudandodjango_network
+
+volumes:
+  db_data:
+
+networks:
+  estudandodjango_network:
+    driver: bridge
