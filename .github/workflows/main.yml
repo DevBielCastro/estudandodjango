@@ -5,6 +5,7 @@ on: [push]
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    
     services:
       db:
         image: mysql:8.0
@@ -16,7 +17,22 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build and test
-      run: |
-        docker-compose -f docker-compose.yml run web python manage.py test
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Instalação do Docker e Docker Compose
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
+      # Passo de build e teste
+      - name: Build and test
+        run: |
+          docker-compose -f docker-compose.yml build
+          docker-compose -f docker-compose.yml run web python manage.py test
