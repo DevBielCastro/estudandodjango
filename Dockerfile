@@ -17,8 +17,9 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
+COPY wait-for-db.sh .
 RUN chmod +x wait-for-db.sh
 
-CMD ["sh", "-c", "./wait-for-db.sh db 3306 -- python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+COPY . .
+
+CMD ["sh", "-c", "./wait-for-db.sh db 3306 python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]

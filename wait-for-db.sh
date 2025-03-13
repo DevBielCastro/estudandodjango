@@ -1,5 +1,4 @@
-@"
-#!/bin/sh
+﻿#!/bin/sh
 
 host="$1"
 port="$2"
@@ -10,6 +9,5 @@ while ! nc -z "$host" "$port"; do
   sleep 2
 done
 
-echo "MySQL pronto! Executando: $@"
+echo "MySQL pronto! Executando comando: $@"
 exec "$@"
-"@ | Set-Content wait-for-db.sh -Encoding UTF8
