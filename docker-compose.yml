@@ -14,9 +14,9 @@ services:
       - estudandodjango_network
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
-      interval: 5s
-      timeout: 10s
-      retries: 10
+      interval: 10s
+      timeout: 20s
+      retries: 15
     ports:
       - "3306:3306"
 
@@ -39,8 +39,6 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-    env_file:
-      - .env
     depends_on:
       db:
         condition: service_healthy
