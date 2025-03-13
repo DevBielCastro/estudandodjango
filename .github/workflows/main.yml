@@ -10,8 +10,10 @@ jobs:
       db:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_USER: ${{ secrets.DB_USER }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s
@@ -20,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Instalação do Docker (versão oficial)
+      # Instalação do Docker
       - name: Install Docker
         run: |
           sudo apt-get remove -y containerd docker.io || true
@@ -36,7 +38,17 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
 
-      # Passo de build e teste
+      # Criar .env temporário
+      - name: Create .env file
+        run: |
+          echo "DEBUG=0" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+
+      # Build e testes
       - name: Build and test
         run: |
           docker-compose -f docker-compose.yml build
